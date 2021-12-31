@@ -100,14 +100,14 @@ def cleanup(hands, discard, num_players=6):
     return hands, discard
 
 
-# returns the soft hand value used by dealer.
+# returns the hand value
 # inputs: str hand
 # outputs: int hand value
-def get_hand_value(hand):  # aak does not read right.
+def get_hand_value(hand):
     if hand == '':  # hand is empty
         raise ValueError
 
-    aces = 0 # num aces in hand
+    aces = 0  # num aces in hand
     val_non_ace = 0
     cards = hand.split(',')
 
@@ -122,24 +122,27 @@ def get_hand_value(hand):  # aak does not read right.
 
     if aces == 0:
         value = val_non_ace
-    elif aces == 1:
-        value = val_non_ace + 11
-        if value > 21:
-            value = val_non_ace + 1
     else:
-        value = val_non_ace + 11
+        value = val_non_ace + 11 + (aces-1)
         if value > 21:
-            value = val_non_ace + 1
-        value += (aces-1) * 1
+            value = val_non_ace + aces
     return value
 
 
-# ai code to decide wheather to hit, true, or not. hits if below 15
+# returns num aces in hand
 # inputs: str hand
-# outputs: bool
-def ai_15(hand):
-    value = get_hand_value(hand)
-    return value < 15
+# outputs: int hand value
+def get_num_aces(hand):
+    if hand == '':  # hand is empty
+        raise ValueError
+
+    aces = 0 # num aces in hand
+    cards = hand.split(',')
+
+    for card in cards:
+        if card == 'A':
+            aces += 1
+    return aces
 
 
 # prints hand output to console
@@ -168,9 +171,14 @@ def print_board_state(hands, bets, seat=3, show_dealer=False):
     print(acc + '\n')
 
 
+# ai code to decide wheather to hit, true, or not. hits if below 15
+# inputs: str hand
+# outputs: bool
+def ai_15(hand):
+    value = get_hand_value(hand)
+    return value < 15
+
 
 if __name__ == "__main__":
-    hands, bets, discard = initialize()
-    deck = get_shuffled_deck()
-    hands, deck = deal(hands, deck)
-    print_board_state(hands, bets)
+    val = get_hand_value('A,3')
+    print(val)

@@ -1,26 +1,33 @@
 from gameFunctions import *
 
-# User Confic
-money = [100,100,100,100,100,100,100] # starting money
+# User Config
+start_money = 100
 default_bet = 5
 blackjack_rate = 1.5
-run = True
+hit_soft_17 = True
 
 # player configuration
 try:
-    seat = int(input("Where would you like to sit at the table? Seats 1 through 6\n").strip())
-    if seat < 1 or seat > 6 or not seat:
+    seat = int(input("Where would you like to sit at the table? Seats 1 through 6\nInput -1 for watching AI play\n").strip())
+    if seat > 6 or not seat:
         print("That is not a valid seat. You are sitting at seat 3")
         seat = 3
 except ValueError:
     seat = 3
 
+# todo: AI config here
+
 print('Default bet: %g,  Blackjack return: %g' % (default_bet, blackjack_rate))
 
 # game setup
+run = True
 hands, bets, discard = initialize()
 deck = get_shuffled_deck()
 bet = default_bet
+money = []
+
+for i in range(len(hands)):
+    money.append(start_money)
 
 while run:
     print("%g%% of Deck Remaining" % (100*len(deck)/(52*6)))
@@ -76,7 +83,7 @@ while run:
                     elif command == 'd':
                         stay = True
                         money[i] -= bets[i]
-                        bets[i] += bets[i]
+                        bets[i] += bets[i] # doubles bet
                         draw = deck.pop()
                         hands[i] += ',' + draw
                         print_board_state(hands, bets, seat)
@@ -96,9 +103,14 @@ while run:
                     draw = deck.pop()
                     hands[i] += ',' + draw
                     value = get_hand_value(hands[i])
+
                 if i == len(hands) - 1: # does dealer last
                     value = get_hand_value(hands[0])
                     while value < 17:
+                        draw = deck.pop()
+                        hands[0] += ',' + draw
+                        value = get_hand_value(hands[0])
+                    if value == 17 and get_num_aces(hands[0]) >= 1 and hit_soft_17:
                         draw = deck.pop()
                         hands[0] += ',' + draw
                         value = get_hand_value(hands[0])
@@ -139,6 +151,6 @@ while run:
 
     # Card cleanup
     hands, discard = cleanup(hands, discard)
-    if len(deck) < 0.2 * 52*6:
+    if len(deck) < 0.15 * 52*6:
         deck, discard = reshuffle(deck, discard)
         print("Shuffle Time!")
