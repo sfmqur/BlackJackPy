@@ -95,7 +95,7 @@ def cleanup(hands, discard, num_players=6):
         for j in range(len(cards_in_hand)):
             discard.append(cards_in_hand.pop())
     hands = []
-    for i in range(num_players):
+    for i in range(num_players+1):
         hands.append('')
     return hands, discard
 
